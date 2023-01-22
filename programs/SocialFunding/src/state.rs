@@ -1,5 +1,22 @@
 use anchor_lang::prelude::*;
 
+#[account]
+pub struct Management {
+    pub admin: Pubkey,
+    pub pause: bool,
+    pub project_stage: i64,
+    pub voting_stage: i64,
+    pub funding_stage: i64,
+}
+#[derive(Accounts)]
+pub struct Stage<'info> {
+    #[account(init,payer=admin,space=32+1+8+8+8)]
+    pub management: Account<'info, Management>,
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
 //-----------------------
 //COMMUNİTY
 //-----------------------
@@ -35,12 +52,10 @@ pub struct JoinCommunity<'info> {
 
 #[account]
 pub struct Project {
-    pub community: Pubkey,
     pub creator: Pubkey,
-    pub timestamp: i64,
+    pub community: Pubkey,
     pub subject: String,
     pub description: String,
-    pub deadline: i64,
 }
 #[derive(Accounts)]
 pub struct CreateProject<'info> {
@@ -48,6 +63,10 @@ pub struct CreateProject<'info> {
     pub project: Account<'info, Project>,
     #[account(mut)]
     pub creator: Signer<'info>,
+    pub management: Account<'info, Management>,
+    pub community: Account<'info, Community>,
+    #[account(init,seeds=[b"counter",project.key().as_ref()],bump,payer=creator,space=8+8+8)]
+    pub counter: Account<'info, VoteCounter>,
     pub system_program: Program<'info, System>,
 }
 
@@ -62,6 +81,7 @@ pub struct Voting {
     pub result: VotingResult,
     pub bump: u8,
 }
+
 #[derive(Accounts)]
 #[instruction(project:Pubkey)]
 pub struct Vote<'info> {
@@ -70,10 +90,23 @@ pub struct Vote<'info> {
     pub system_program: Program<'info, System>,
     #[account(mut)]
     pub user: Signer<'info>,
+    pub management: Account<'info, Management>,
+    pub project: Account<'info, Project>,
+    #[account(
+        mut,
+        seeds = [b"counter", project.key().as_ref()],
+        bump,
+    )]
+    pub counter: Account<'info, VoteCounter>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
 pub enum VotingResult {
     Yes,
     No,
+}
+#[account]
+pub struct VoteCounter {
+    pub yes_count: i64,
+    pub no_count: i64,
 }
