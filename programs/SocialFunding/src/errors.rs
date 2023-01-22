@@ -19,4 +19,6 @@ pub enum ErrorCode {
     ContractPause,
 
     NotInProjectStage,
+
+    InvalidChar,
 }

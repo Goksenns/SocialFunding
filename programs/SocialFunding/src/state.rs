@@ -104,6 +104,17 @@ pub struct Vote<'info> {
 pub enum VotingResult {
     Yes,
     No,
+    Invalid,
+}
+
+impl VotingResult {
+    pub fn validate(voting_char: char) -> Self {
+        match voting_char {
+            'Y' => Self::Yes,
+            'N' => Self::No,
+            _ => Self::Invalid,
+        }
+    }
 }
 #[account]
 pub struct VoteCounter {

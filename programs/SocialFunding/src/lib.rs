@@ -8,7 +8,6 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod social_funding {
-    use std::panic::RefUnwindSafe;
 
     use super::*;
 
@@ -119,23 +118,26 @@ pub mod social_funding {
         Ok(())
     }
 
-    pub fn vote(ctx: Context<Vote>, result: VotingResult, voting_bump: u8) -> Result<()> {
+    pub fn vote(ctx: Context<Vote>, vote: String, voting_bump: u8) -> Result<()> {
         let voting = &mut ctx.accounts.voting;
-        let clock = Clock::get().unwrap();
         let project = &mut ctx.accounts.project;
         let counter = &mut ctx.accounts.counter;
+        let clock = Clock::get().unwrap();
 
-        voting.user = *ctx.accounts.user.key;
-        voting.project = project.key();
-        voting.timestamp = clock.unix_timestamp;
-        voting.result = result;
-        voting.bump = voting_bump;
+        let voting_char = VotingResult::validate(vote.chars().nth(0).unwrap());
+        require!(voting_char != VotingResult::Invalid, ErrorCode::InvalidChar);
 
-        if {
+        if voting_char == VotingResult::Yes {
             counter.yes_count += 1;
         } else {
             counter.no_count += 1;
         }
+
+        voting.user = *ctx.accounts.user.key;
+        voting.project = project.key();
+        voting.timestamp = clock.unix_timestamp;
+        voting.result = voting_char;
+        voting.bump = voting_bump;
 
         Ok(())
     }
