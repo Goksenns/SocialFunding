@@ -92,6 +92,7 @@ pub struct Vote<'info> {
     pub user: Signer<'info>,
     pub management: Account<'info, Management>,
     pub project: Account<'info, Project>,
+    pub community: Account<'info, Community>,
     #[account(
         mut,
         seeds = [b"counter", project.key().as_ref()],

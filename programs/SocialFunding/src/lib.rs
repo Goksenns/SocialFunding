@@ -66,6 +66,7 @@ pub mod social_funding {
 
         Ok(())
     }
+
     pub fn join_community(ctx: Context<JoinCommunity>) -> Result<()> {
         let community = &mut ctx.accounts.community;
         let user = &ctx.accounts.user;
@@ -78,6 +79,7 @@ pub mod social_funding {
 
         Ok(())
     }
+
     pub fn create_project(
         ctx: Context<CreateProject>,
         subject: String,
@@ -87,8 +89,9 @@ pub mod social_funding {
         let management = &mut ctx.accounts.management;
         let creator = &ctx.accounts.creator;
         let community = &mut ctx.accounts.community;
-        let clock = Clock::get().unwrap();
         let counter = &mut ctx.accounts.counter;
+
+        let clock = Clock::get().unwrap();
 
         require!(!management.pause, ErrorCode::ContractPause);
         require!(
@@ -121,8 +124,27 @@ pub mod social_funding {
     pub fn vote(ctx: Context<Vote>, vote: String, voting_bump: u8) -> Result<()> {
         let voting = &mut ctx.accounts.voting;
         let project = &mut ctx.accounts.project;
+        let management = &mut ctx.accounts.management;
         let counter = &mut ctx.accounts.counter;
+        let community = &mut ctx.accounts.community;
+        let user = &mut ctx.accounts.user;
+
         let clock = Clock::get().unwrap();
+
+        let mut is_this_member = false;
+        for member in community.members.iter() {
+            if &user.key() == member {
+                is_this_member = true;
+                break;
+            }
+        }
+        require!(is_this_member, ErrorCode::AuthenticationError);
+
+        require!(
+            management.voting_stage < clock.unix_timestamp
+                && management.funding_stage > clock.unix_timestamp,
+            ErrorCode::NotInVotingStage
+        );
 
         let voting_char = VotingResult::validate(vote.chars().nth(0).unwrap());
         require!(voting_char != VotingResult::Invalid, ErrorCode::InvalidChar);
@@ -133,7 +155,7 @@ pub mod social_funding {
             counter.no_count += 1;
         }
 
-        voting.user = *ctx.accounts.user.key;
+        voting.user = *user.key;
         voting.project = project.key();
         voting.timestamp = clock.unix_timestamp;
         voting.result = voting_char;
