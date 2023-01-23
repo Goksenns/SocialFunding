@@ -70,12 +70,49 @@ pub mod social_funding {
     pub fn join_community(ctx: Context<JoinCommunity>) -> Result<()> {
         let community = &mut ctx.accounts.community;
         let user = &ctx.accounts.user;
+        let member_counter = &mut ctx.accounts.member_counter;
 
         if community.permission == false {
             community.members.push(user.key());
         } else {
             community.members_pool.push(user.key());
+            member_counter.counter = 0;
         }
+
+        Ok(())
+    }
+    pub fn add_member_to_community(
+        ctx: Context<AddMembertoCommunity>,
+        vote: String,
+        voting_bump: u8,
+    ) -> Result<()> {
+        let voting_for_members = &mut ctx.accounts.voting_for_members;
+        let community = &mut ctx.accounts.community;
+        let member_counter = &mut ctx.accounts.member_counter;
+        let user = &mut ctx.accounts.user;
+
+        let mut is_this_member = false;
+        for member in community.members.iter() {
+            if &user.key() == member {
+                is_this_member = true;
+                break;
+            }
+        }
+
+        require!(is_this_member, ErrorCode::AuthenticationError);
+
+        let members_char = MembersResult::validate(vote.chars().nth(0).unwrap());
+        require!(
+            members_char != MembersResult::Invalid,
+            ErrorCode::InvalidChar
+        );
+
+        if member_counter.counter > (community.members.len() / 5) as i64 {
+            community.members.push(user.key());
+        }
+        voting_for_members.user = *user.key;
+        voting_for_members.community = community.key();
+        voting_for_members.bump = voting_bump;
 
         Ok(())
     }

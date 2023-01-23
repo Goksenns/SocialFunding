@@ -43,7 +43,55 @@ pub struct CreateCommunity<'info> {
 pub struct JoinCommunity<'info> {
     #[account(mut)]
     pub community: Account<'info, Community>,
+    #[account(mut)]
     pub user: Signer<'info>,
+    #[account(init,seeds=[b"member_counter",community.key().as_ref()],bump,payer=user,space=8+8)]
+    pub member_counter: Account<'info, MemberCounter>,
+    pub system_program: Program<'info, System>,
+}
+
+//permission olan bir community ise member eklemek için bir oylama yapılır
+#[account]
+pub struct VotingForMembers {
+    pub user: Pubkey,
+    pub community: Pubkey,
+    pub bump: u8,
+    pub result: MembersResult,
+}
+
+#[derive(Accounts)]
+pub struct AddMembertoCommunity<'info> {
+    #[account(init,seeds=[b"member_counter",community.key().as_ref()],bump,payer=user,space=8+8)]
+    pub voting_for_members: Account<'info, VotingForMembers>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub community: Account<'info, Community>,
+    #[account(
+        mut,
+        seeds = [b"counter", community.key().as_ref()],
+        bump,
+    )]
+    pub member_counter: Account<'info, MemberCounter>,
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct MemberCounter {
+    pub counter: i64,
+}
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum MembersResult {
+    Yes,
+    Invalid,
+}
+
+impl MembersResult {
+    pub fn validate(members_char: char) -> Self {
+        match members_char {
+            'Y' => Self::Yes,
+            _ => Self::Invalid,
+        }
+    }
 }
 
 //-----------------------
