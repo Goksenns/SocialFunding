@@ -11,9 +11,10 @@ pub mod social_funding {
 
     use super::*;
 
-    pub fn pause(ctx: Context<Stage>, pause: bool) -> Result<()> {
+    pub fn stage(ctx: Context<Stage>) -> Result<()> {
         let stage = &mut ctx.accounts.management;
         let admin = &mut ctx.accounts.admin;
+        let sol_bank = &mut ctx.accounts.sol_bank;
 
         // ENV DOSYASI LAZIM
         stage.admin = Pubkey::new(&[
@@ -25,16 +26,28 @@ pub mod social_funding {
 
         require!(stage.admin == admin.key(), ErrorCode::AuthenticationError);
 
+        sol_bank.amount = 0;
+
+        Ok(())
+    }
+    pub fn pause(ctx: Context<Pause>, pause: bool) -> Result<()> {
+        let stage = &mut ctx.accounts.management;
+        let admin = &mut ctx.accounts.admin;
+
         stage.pause = pause;
+
+        require!(stage.admin == admin.key(), ErrorCode::AuthenticationError);
 
         if !pause {
             let clock = Clock::get().unwrap();
 
-            stage.project_stage = clock.unix_timestamp + 60 * 60 * 24 * 3;
-            stage.voting_stage = stage.project_stage + 60 * 60 * 24 * 5;
-            stage.funding_stage = stage.voting_stage + 60 * 60 * 24 * 10;
-        }
+            const ONE_DAY: i64 = 60 * 60 * 24;
 
+            stage.project_stage = clock.unix_timestamp + ONE_DAY * 3;
+            stage.voting_stage = stage.project_stage + ONE_DAY * 5;
+            stage.execute_stage = stage.voting_stage + ONE_DAY;
+            stage.donate_stage = stage.execute_stage + ONE_DAY * 10;
+        }
         Ok(())
     }
 
@@ -81,12 +94,7 @@ pub mod social_funding {
 
         Ok(())
     }
-    pub fn add_member_to_community(
-        ctx: Context<AddMembertoCommunity>,
-        vote: String,
-        voting_bump: u8,
-    ) -> Result<()> {
-        let voting_for_members = &mut ctx.accounts.voting_for_members;
+    pub fn add_member_to_community(ctx: Context<AddMembertoCommunity>) -> Result<()> {
         let community = &mut ctx.accounts.community;
         let member_counter = &mut ctx.accounts.member_counter;
         let user = &mut ctx.accounts.user;
@@ -100,19 +108,11 @@ pub mod social_funding {
         }
 
         require!(is_this_member, ErrorCode::AuthenticationError);
-
-        let members_char = MembersResult::validate(vote.chars().nth(0).unwrap());
-        require!(
-            members_char != MembersResult::Invalid,
-            ErrorCode::InvalidChar
-        );
+        member_counter.counter += 1;
 
         if member_counter.counter > (community.members.len() / 5) as i64 {
             community.members.push(user.key());
         }
-        voting_for_members.user = *user.key;
-        voting_for_members.community = community.key();
-        voting_for_members.bump = voting_bump;
 
         Ok(())
     }
@@ -154,7 +154,7 @@ pub mod social_funding {
         project.description = description;
         project.creator = *creator.key;
         project.community = community.key();
-
+        project.executable = false;
         Ok(())
     }
 
@@ -167,6 +167,7 @@ pub mod social_funding {
         let user = &mut ctx.accounts.user;
 
         let clock = Clock::get().unwrap();
+        require!(!management.pause, ErrorCode::ContractPause);
 
         let mut is_this_member = false;
         for member in community.members.iter() {
@@ -179,7 +180,7 @@ pub mod social_funding {
 
         require!(
             management.voting_stage < clock.unix_timestamp
-                && management.funding_stage > clock.unix_timestamp,
+                && management.execute_stage > clock.unix_timestamp,
             ErrorCode::NotInVotingStage
         );
 
@@ -197,6 +198,63 @@ pub mod social_funding {
         voting.timestamp = clock.unix_timestamp;
         voting.result = voting_char;
         voting.bump = voting_bump;
+
+        Ok(())
+    }
+    pub fn execute_project(ctx: Context<ExecuteProject>) -> Result<()> {
+        let project = &mut ctx.accounts.project;
+        let management = &mut ctx.accounts.management;
+        let creator = &ctx.accounts.creator;
+        let community = &mut ctx.accounts.community;
+        let counter = &mut ctx.accounts.counter;
+
+        let clock = Clock::get().unwrap();
+        require!(!management.pause, ErrorCode::ContractPause);
+
+        require!(
+            management.execute_stage < clock.unix_timestamp
+                && management.donate_stage > clock.unix_timestamp,
+            ErrorCode::NotInExecuteStage
+        );
+
+        require!(
+            creator.key() == project.creator,
+            ErrorCode::AuthenticationError
+        );
+
+        if counter.yes_count > counter.no_count
+            && counter.yes_count + counter.no_count > (community.members.len() / 2) as i64
+        {
+            project.executable = true;
+        }
+        require!(project.executable, ErrorCode::NotPublish);
+
+        Ok(())
+    }
+
+    pub fn donate_project(
+        ctx: Context<DonateProject>,
+        _donate: u64,
+        donate_bump: u8,
+    ) -> Result<()> {
+        let donate = &mut ctx.accounts.donate;
+        let project = &mut ctx.accounts.project;
+        let management = &mut ctx.accounts.management;
+        let community = &mut ctx.accounts.community;
+        let user = &mut ctx.accounts.community;
+
+        let clock = Clock::get().unwrap();
+        require!(!management.pause, ErrorCode::ContractPause);
+
+        require!(
+            management.donate_stage < clock.unix_timestamp,
+            ErrorCode::NotInDonateStage
+        );
+
+        donate.donate_count += 1;
+        donate.amount += _donate;
+
+        donate.donate_bump = donate_bump;
 
         Ok(())
     }

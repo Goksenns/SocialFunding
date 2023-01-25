@@ -6,15 +6,30 @@ pub struct Management {
     pub pause: bool,
     pub project_stage: i64,
     pub voting_stage: i64,
-    pub funding_stage: i64,
+    pub execute_stage: i64,
+    pub donate_stage: i64,
 }
 #[derive(Accounts)]
 pub struct Stage<'info> {
     #[account(init,payer=admin,space=32+1+8+8+8)]
     pub management: Account<'info, Management>,
+    #[account(init,seeds=[b"sol_bank"],bump,payer=admin,space=8+8)]
+    pub sol_bank: Account<'info, SolBank>,
     #[account(mut)]
     pub admin: Signer<'info>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct Pause<'info> {
+    #[account(mut)]
+    pub management: Account<'info, Management>,
+    #[account(mut)]
+    pub admin: Signer<'info>,
+}
+#[account]
+pub struct SolBank {
+    pub amount: u64,
 }
 
 //-----------------------
@@ -51,24 +66,15 @@ pub struct JoinCommunity<'info> {
 }
 
 //permission olan bir community ise member eklemek için bir oylama yapılır
-#[account]
-pub struct VotingForMembers {
-    pub user: Pubkey,
-    pub community: Pubkey,
-    pub bump: u8,
-    pub result: MembersResult,
-}
 
 #[derive(Accounts)]
 pub struct AddMembertoCommunity<'info> {
-    #[account(init,seeds=[b"member_counter",community.key().as_ref()],bump,payer=user,space=8+8)]
-    pub voting_for_members: Account<'info, VotingForMembers>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub community: Account<'info, Community>,
     #[account(
         mut,
-        seeds = [b"counter", community.key().as_ref()],
+        seeds = [b"member_counter", community.key().as_ref()],
         bump,
     )]
     pub member_counter: Account<'info, MemberCounter>,
@@ -78,20 +84,6 @@ pub struct AddMembertoCommunity<'info> {
 #[account]
 pub struct MemberCounter {
     pub counter: i64,
-}
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
-pub enum MembersResult {
-    Yes,
-    Invalid,
-}
-
-impl MembersResult {
-    pub fn validate(members_char: char) -> Self {
-        match members_char {
-            'Y' => Self::Yes,
-            _ => Self::Invalid,
-        }
-    }
 }
 
 //-----------------------
@@ -104,6 +96,7 @@ pub struct Project {
     pub community: Pubkey,
     pub subject: String,
     pub description: String,
+    pub executable: bool,
 }
 #[derive(Accounts)]
 pub struct CreateProject<'info> {
@@ -169,4 +162,47 @@ impl VotingResult {
 pub struct VoteCounter {
     pub yes_count: i64,
     pub no_count: i64,
+}
+#[derive(Accounts)]
+pub struct ExecuteProject<'info> {
+    #[account(mut)]
+    pub project: Account<'info, Project>,
+    #[account(mut)]
+    pub creator: Signer<'info>,
+    pub management: Account<'info, Management>,
+    pub community: Account<'info, Community>,
+    #[account(
+        mut,
+        seeds = [b"counter", project.key().as_ref()],
+        bump,
+    )]
+    pub counter: Account<'info, VoteCounter>,
+}
+
+//-----------------------
+//DONATE TO THE PROJECT
+//-----------------------
+
+#[account]
+pub struct Donate {
+    pub amount: u64,
+    pub donate_count: u64,
+    pub timestamp: i64,
+    pub donate_bump: u8,
+}
+
+#[derive(Accounts)]
+#[instruction(project:Pubkey) ]
+
+pub struct DonateProject<'info> {
+    #[account(init,seeds=[b"donate",project.key().as_ref()],bump,payer=user,space=8+8+8+8)]
+    pub donate: Account<'info, Donate>,
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub community: Account<'info, Community>,
+    pub project: Account<'info, Project>,
+    pub management: Account<'info, Management>,
+    #[account(mut,seeds=[b"sol_bank"],bump)]
+    pub sol_bank: Account<'info, SolBank>,
 }

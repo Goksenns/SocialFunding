@@ -20,6 +20,8 @@ pub enum ErrorCode {
 
     NotInProjectStage,
     NotInVotingStage,
+    NotInExecuteStage,
+    NotInDonateStage,
 
     InvalidChar,
 }
