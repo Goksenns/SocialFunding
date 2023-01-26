@@ -14,17 +14,26 @@ pub enum ErrorCode {
     )]
     NotPublish,
 
+    #[msg("You are not authenticated.")]
     AuthenticationError,
 
+    #[msg("Contract is not open yet.")]
     ContractPause,
 
+    #[msg("Not is project stage.")]
     NotInProjectStage,
+    #[msg("Not is project voting stage.")]
     NotInVotingStage,
+    #[msg("Not is project execute stage.")]
     NotInExecuteStage,
+    #[msg("Not is project donate stage.")]
     NotInDonateStage,
+    #[msg("Not is funding stage.")]
     NotInDistributeStage,
 
+    #[msg("Invalid char detected.")]
     InvalidChar,
 
+    #[msg("Already executed, can't call more!")]
     AlreadyExecuted,
 }
