@@ -1,15 +1,15 @@
 ### <font color="F55050"><b>SORUNLAR:</b></font>
 
-- Bugün fon bulmak; sosyal örgütler, üniversite kulüpleri veya yaratıcı bir fikrini hayata geçirmek isteyen insanların sıklıkla karşılaştığı bir sorun . Özellikle sosyal fayda sağlayacak projelerin dikkate alınması,fark edilmesi ve fonlanması daha da zor. 
-- Bunların yanında geleneksel kitlesel fonlamanın bir diğer sorunu , fonlamanın şeffaf olmaması. Toplanan bağışların takip edilemiyor olması da güvensiz bir sistemin sonucu.
-
+- Bugün fon bulmak; sosyal örgütler, üniversite kulüpleri veya yaratıcı bir fikrini hayata geçirmek isteyen insanların sıklıkla karşılaştığı bir sorun . Özellikle sosyal fayda sağlayacak projelerin fonlanması, dikkate alınması, fark edilmesi daha da zor. 
+- Bunların yanında geleneksel kitlesel fonlamanın bir diğer sorunu , fonlamanın şeffaf olmaması. Toplanan bağışların takip edilemiyor olması da güvensiz bir sistemin sonucundan kaynaklı.
 
 ### <font color=AACB73><b>ÇÖZÜMLER:</b></font>
 
 - Kişilere ve kurumlara güvenmek yerine , merkeziyetsiz ve güven üzerine kurulu bir sistem sağlıyoruz.
+- Uzun süredir devam eden zorlukları çözmeye katkıda bulunabilecek insanların dayanışmasını sağlıyoruz.
 - Sosyal fayda sağlayacak herhangi bir projenin fark edilmesi ve fon bulması için fırsat sağlıyoruz.
 - En çok oy alan projenin daha fazla fonlanmasını sağlayarak, herkesin hak ettiği kadar pay almasını sağlıyoruz.
-- Herhangi bir kuruluşun veya kişilerin aracı olmasının önüne geçiyoruz. Bağış yapmak isteyen insanlar ve projeleri direkt bir araya getiriyoruz.
+- Herhangi bir kuruluşun veya kişilerin aracı olmasının önüne geçiyoruz. Bağış yapmak isteyen insanları ve projeleri aracısız bir araya getiriyoruz.
 - İnsanlar, sadece istediği projeye bağış yapıyor ve blockchain tabanlı olan bu sistemde de bağışların takibini şeffaf bir şekilde yapabiliyor.
 
 ### <font color=C780FA><b>SOCIAL FUNDING GENEL BAKIŞ:</b></font>
