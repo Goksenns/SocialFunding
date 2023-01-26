@@ -23,14 +23,14 @@
          >  execute project stage : 1 gün
          > donate stage : 10 gün
 
-<font color=674188>project stage</font> aşaması projenin yaratılma aşamasıdır.Communitylerden bir kişi -bu kişi creator oluyor- bu süreçte projeyi communitysi içerisinde yayınlar.
+<font color=674188>project stage</font> : Aşaması projenin yaratılma aşamasıdır.Communitylerden bir kişi -bu kişi creator oluyor- bu süreçte projeyi communitysi içerisinde yayınlar.
 
-<font color=674188>voting stage</font> aşamasında creatorın sisteme yüklediği proje üyeler tarafından oylanır.Eğer üyelerin %50sinden fazlası oy kullanırsa ve evet oyu hayır oyundan fazla olursa proje execute edilmeye hak kazanır, aksi takdirde kendi communitysinden geçer oy alamayan proje fonlanmak için sunulamaz.
+<font color=674188>voting stage</font> : Aşamasında creatorın sisteme yüklediği proje üyeler tarafından oylanır.Eğer üyelerin %50sinden fazlası oy kullanırsa ve evet oyu hayır oyundan fazla olursa proje execute edilmeye hak kazanır, aksi takdirde kendi communitysinden geçer oy alamayan proje fonlanmak için sunulamaz.
 Bu şekilde community içerisinde başkan gibi bir otorite yaratmamış ve herkesin eşit söz hakkına sahip olduğu bir dao yapısı olarak işlemesini sağlamak istiyoruz.
 
-<font color=674188>execute project</font> aşamasında community içerisindeki oylar sayılır ve geçerli oyu alan projelerin fonlamaya açılması için 1 gün müddet tanınır.
+<font color=674188>execute project</font> : Aşamasında community içerisindeki oylar sayılır ve geçerli oyu alan projelerin fonlamaya açılması için 1 gün müddet tanınır.
 
-<font color=674188>donate stage</font> aşamasında ise projeler artık fonlamaya açılırlar ve bağış toplarlar.
+<font color=674188>donate stage</font> : Aşamasında ise projeler artık fonlamaya açılırlar ve bağış toplarlar.
 Bu aşamadan sonra sistem pause edilir ve toplanan paralar projelere dağıtılır,sonrasında yeniden aynı döngüye başlar.
 
 ### <font color=EBC7E6><b>ROADMAP FOR PROJECT:</b></font>
