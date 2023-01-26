@@ -5,7 +5,7 @@
 
 ### <font color=AACB73><b>ÇÖZÜMLER:</b></font>
 
-- Kişilere ve kurumlara güvenmek yerine , merkeziyetsiz ve güven üzerine kurulu bir sistem sağlıyoruz.
+- Kişilere ve kurumlara güvenmek zorunda bırakılmak yerine , merkeziyetsiz ve şeffaf bir sistem sağlıyoruz.
 - Uzun süredir devam eden zorlukları çözmeye katkıda bulunabilecek insanların dayanışmasını sağlıyoruz.
 - Sosyal fayda sağlayacak herhangi bir projenin fark edilmesi ve fon bulması için fırsat sağlıyoruz.
 - En çok oy alan projenin daha fazla fonlanmasını sağlayarak, herkesin hak ettiği kadar pay almasını sağlıyoruz.
