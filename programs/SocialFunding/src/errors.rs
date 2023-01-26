@@ -22,6 +22,9 @@ pub enum ErrorCode {
     NotInVotingStage,
     NotInExecuteStage,
     NotInDonateStage,
+    NotInDistributeStage,
 
     InvalidChar,
+
+    AlreadyExecuted,
 }

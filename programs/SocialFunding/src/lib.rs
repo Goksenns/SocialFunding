@@ -9,24 +9,24 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 #[program]
 pub mod social_funding {
 
+    use anchor_lang::solana_program::program::{invoke, invoke_signed};
+
     use super::*;
 
-    pub fn stage(ctx: Context<Stage>) -> Result<()> {
+    pub fn stage(ctx: Context<Stage>, sol_bank_bump: u8) -> Result<()> {
         let stage = &mut ctx.accounts.management;
         let admin = &mut ctx.accounts.admin;
         let sol_bank = &mut ctx.accounts.sol_bank;
 
-        // ENV DOSYASI LAZIM
-        stage.admin = Pubkey::new(&[
-            160, 31, 10, 192, 18, 38, 7, 220, 161, 243, 36, 69, 11, 145, 13, 137, 102, 251, 202,
-            220, 69, 242, 71, 65, 108, 125, 122, 185, 85, 221, 19, 135, 192, 11, 63, 131, 77, 26,
-            55, 85, 10, 125, 55, 34, 190, 57, 104, 199, 188, 197, 96, 143, 51, 176, 41, 74, 102,
-            232, 146, 107, 60, 138, 216, 189,
-        ]);
-
         require!(stage.admin == admin.key(), ErrorCode::AuthenticationError);
 
+        require!(stage.executed == true, ErrorCode::AlreadyExecuted);
+
+        stage.executed = true;
+        stage.admin = admin.key();
+
         sol_bank.amount = 0;
+        sol_bank.bump = sol_bank_bump;
 
         Ok(())
     }
@@ -43,10 +43,11 @@ pub mod social_funding {
 
             const ONE_DAY: i64 = 60 * 60 * 24;
 
-            stage.project_stage = clock.unix_timestamp + ONE_DAY * 3;
-            stage.voting_stage = stage.project_stage + ONE_DAY * 5;
-            stage.execute_stage = stage.voting_stage + ONE_DAY;
-            stage.donate_stage = stage.execute_stage + ONE_DAY * 10;
+            stage.project_stage = clock.unix_timestamp;
+            stage.voting_stage = stage.project_stage + ONE_DAY * 3;
+            stage.execute_stage = stage.voting_stage + ONE_DAY * 5;
+            stage.donate_stage = stage.execute_stage + ONE_DAY;
+            stage.distribute_stage = stage.donate_stage + ONE_DAY * 10;
         }
         Ok(())
     }
@@ -155,6 +156,7 @@ pub mod social_funding {
         project.creator = *creator.key;
         project.community = community.key();
         project.executable = false;
+
         Ok(())
     }
 
@@ -207,6 +209,7 @@ pub mod social_funding {
         let creator = &ctx.accounts.creator;
         let community = &mut ctx.accounts.community;
         let counter = &mut ctx.accounts.counter;
+        let sol_bank = &mut ctx.accounts.sol_bank;
 
         let clock = Clock::get().unwrap();
         require!(!management.pause, ErrorCode::ContractPause);
@@ -229,6 +232,8 @@ pub mod social_funding {
         }
         require!(project.executable, ErrorCode::NotPublish);
 
+        sol_bank.projects.push(project.key());
+
         Ok(())
     }
 
@@ -238,24 +243,80 @@ pub mod social_funding {
         donate_bump: u8,
     ) -> Result<()> {
         let donate = &mut ctx.accounts.donate;
-        let project = &mut ctx.accounts.project;
         let management = &mut ctx.accounts.management;
-        let community = &mut ctx.accounts.community;
-        let user = &mut ctx.accounts.community;
+        let user = &mut ctx.accounts.user;
+        let sol_bank = &mut ctx.accounts.sol_bank;
 
         let clock = Clock::get().unwrap();
         require!(!management.pause, ErrorCode::ContractPause);
 
         require!(
-            management.donate_stage < clock.unix_timestamp,
+            management.donate_stage < clock.unix_timestamp
+                && management.distribute_stage > clock.unix_timestamp,
             ErrorCode::NotInDonateStage
         );
 
+        let transfer_sol = anchor_lang::solana_program::system_instruction::transfer(
+            &user.key(),
+            &sol_bank.key(),
+            _donate,
+        );
+
+        invoke(
+            &transfer_sol,
+            &[
+                user.to_account_info(),
+                sol_bank.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+        )?;
+
+        sol_bank.amount += _donate;
         donate.donate_count += 1;
         donate.amount += _donate;
+        sol_bank.sol_counter += 1;
 
         donate.donate_bump = donate_bump;
 
+        Ok(())
+    }
+
+    pub fn distribute_funds(ctx: Context<DistributeFunds>) -> Result<()> {
+        let sol_bank = &mut ctx.accounts.sol_bank;
+        let management = &mut ctx.accounts.management;
+        let user = &ctx.accounts.user;
+        let donate = &mut ctx.accounts.donate;
+        let project = &mut ctx.accounts.project;
+
+        let clock = Clock::get().unwrap();
+
+        require!(
+            user.key() == management.admin,
+            ErrorCode::AuthenticationError
+        );
+
+        require!(
+            management.distribute_stage < clock.unix_timestamp,
+            ErrorCode::NotInDistributeStage
+        );
+
+        let funded_amount = (donate.donate_count / sol_bank.sol_counter) as u64 * sol_bank.amount;
+
+        let transfer_sol = anchor_lang::solana_program::system_instruction::transfer(
+            &sol_bank.key(),
+            &project.key(),
+            funded_amount,
+        );
+
+        invoke_signed(
+            &transfer_sol,
+            &[
+                sol_bank.to_account_info(),
+                project.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+            &[&[&[sol_bank.bump]]],
+        )?;
         Ok(())
     }
 }

@@ -4,10 +4,12 @@ use anchor_lang::prelude::*;
 pub struct Management {
     pub admin: Pubkey,
     pub pause: bool,
+    pub executed: bool,
     pub project_stage: i64,
     pub voting_stage: i64,
     pub execute_stage: i64,
     pub donate_stage: i64,
+    pub distribute_stage: i64,
 }
 #[derive(Accounts)]
 pub struct Stage<'info> {
@@ -30,6 +32,10 @@ pub struct Pause<'info> {
 #[account]
 pub struct SolBank {
     pub amount: u64,
+    pub bump: u8,
+    pub projects: Vec<Pubkey>,
+    pub previous_project: Vec<Pubkey>,
+    pub sol_counter: u64,
 }
 
 //-----------------------
@@ -177,6 +183,8 @@ pub struct ExecuteProject<'info> {
         bump,
     )]
     pub counter: Account<'info, VoteCounter>,
+    #[account(mut,seeds=[b"sol_bank"],bump)]
+    pub sol_bank: Account<'info, SolBank>,
 }
 
 //-----------------------
@@ -200,9 +208,20 @@ pub struct DonateProject<'info> {
     pub system_program: Program<'info, System>,
     #[account(mut)]
     pub user: Signer<'info>,
-    pub community: Account<'info, Community>,
     pub project: Account<'info, Project>,
     pub management: Account<'info, Management>,
     #[account(mut,seeds=[b"sol_bank"],bump)]
     pub sol_bank: Account<'info, SolBank>,
+}
+
+#[derive(Accounts)]
+pub struct DistributeFunds<'info> {
+    #[account(mut,seeds=[b"sol_bank"],bump)]
+    pub sol_bank: Account<'info, SolBank>,
+    pub management: Account<'info, Management>,
+    pub user: Signer<'info>,
+    pub project: Account<'info, Project>,
+    #[account(seeds=[b"donate",project.key().as_ref()],bump)]
+    pub donate: Account<'info, Donate>,
+    pub system_program: Program<'info, System>,
 }
