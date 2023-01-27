@@ -319,4 +319,109 @@ pub mod social_funding {
         )?;
         Ok(())
     }
+
+    pub fn ask_for_withdraw(
+        ctx: Context<AskForWithdraw>,
+        amount: u64,
+        withdraw_bump: u8,
+    ) -> Result<()> {
+        let withdraw = &mut ctx.accounts.withdraw;
+        let user = &mut ctx.accounts.user;
+        let counter = &mut ctx.accounts.counter;
+        let community = &mut ctx.accounts.community;
+        let donate = &mut ctx.accounts.donate;
+
+        let mut is_this_member = false;
+        for member in community.members.iter() {
+            if &user.key() == member {
+                is_this_member = true;
+                break;
+            }
+        }
+        require!(is_this_member, ErrorCode::AuthenticationError);
+
+        require!(amount < donate.amount, ErrorCode::InsufficiantError);
+
+        counter.no_count = 0;
+        counter.yes_count = 0;
+
+        withdraw.user = *user.key;
+        withdraw.amount = amount;
+        withdraw.bump = withdraw_bump;
+
+        withdraw.executable = false;
+        withdraw.executed = false;
+
+        Ok(())
+    }
+
+    pub fn voting_withdraw(
+        ctx: Context<VotingWithdraw>,
+        vote: String,
+        withdraw_bump: u8,
+    ) -> Result<()> {
+        let withdraw = &mut ctx.accounts.withdraw;
+        let user = &mut ctx.accounts.user;
+        let community = &mut ctx.accounts.community;
+        let counter = &mut ctx.accounts.counter;
+
+        let mut is_this_member = false;
+        for member in community.members.iter() {
+            if &user.key() == member {
+                is_this_member = true;
+                break;
+            }
+        }
+
+        require!(is_this_member, ErrorCode::AuthenticationError);
+
+        let voting_char = VotingResult::validate(vote.chars().nth(0).unwrap());
+        require!(voting_char != VotingResult::Invalid, ErrorCode::InvalidChar);
+
+        if voting_char == VotingResult::Yes {
+            counter.yes_count += 1;
+        } else {
+            counter.no_count += 1;
+        }
+
+        if counter.yes_count > (counter.no_count + counter.yes_count) * 60 / 100
+            && counter.yes_count + counter.no_count > (community.members.len() / 2) as i64
+        {
+            withdraw.executable = true;
+        }
+
+        withdraw.bump = withdraw_bump;
+
+        Ok(())
+    }
+
+    pub fn withdraw(ctx: Context<VotingWithdraw>) -> Result<()> {
+        let withdraw = &mut ctx.accounts.withdraw;
+        let user = &mut ctx.accounts.user;
+        let project = &mut ctx.accounts.project;
+
+        require!(user.key() == withdraw.user, ErrorCode::AuthenticationError);
+        require!(withdraw.executed == false, ErrorCode::AlreadyExecuted);
+
+        if withdraw.executable == true {
+            withdraw.executed = true;
+
+            let transfer_sol = anchor_lang::solana_program::system_instruction::transfer(
+                &project.key(),
+                &user.key(),
+                withdraw.amount,
+            );
+
+            invoke(
+                &transfer_sol,
+                &[
+                    project.to_account_info(),
+                    user.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+            )?;
+        }
+
+        Ok(())
+    }
 }

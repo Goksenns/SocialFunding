@@ -36,6 +36,8 @@ pub struct SolBank {
     pub projects: Vec<Pubkey>,
     pub previous_project: Vec<Pubkey>,
     pub sol_counter: u64,
+    pub project_amounts: Vec<u64>,
+    pub project_counts: Vec<u64>,
 }
 
 //-----------------------
@@ -223,5 +225,52 @@ pub struct DistributeFunds<'info> {
     pub project: Account<'info, Project>,
     #[account(seeds=[b"donate",project.key().as_ref()],bump)]
     pub donate: Account<'info, Donate>,
+    pub system_program: Program<'info, System>,
+}
+
+//parayı çekebilmesi için community içinde oylama yapılır
+
+#[account]
+pub struct Withdraw {
+    pub user: Pubkey,
+    pub bump: u8,
+    pub result: VotingResult,
+    pub amount: u64,
+    pub executed: bool,
+    pub executable: bool,
+}
+
+#[derive(Accounts)]
+pub struct AskForWithdraw<'info> {
+    #[account(init,seeds=[b"withdraw",user.key().as_ref(),project.key().as_ref()],bump,payer=user,space=8+8+8+8)]
+    pub withdraw: Account<'info, Withdraw>,
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub project: Account<'info, Project>,
+    #[account(seeds=[b"donate",project.key().as_ref()],bump)]
+    pub donate: Account<'info, Donate>,
+    #[account(init,seeds=[b"withdraw_counter",project.key().as_ref(),user.key().as_ref()],bump,payer=user,space=8+8+8)]
+    pub counter: Account<'info, VoteCounter>,
+    pub community: Account<'info, Community>,
+}
+
+#[derive(Accounts)]
+pub struct VotingWithdraw<'info> {
+    #[account(seeds=[b"withdraw",user.key().as_ref(),project.key().as_ref()],bump)]
+    pub withdraw: Account<'info, Withdraw>,
+    #[account(mut)]
+    pub community: Account<'info, Community>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub project: Account<'info, Project>,
+    #[account(
+        mut,
+        seeds = [b"withdraw_counter", withdraw.user.as_ref(),project.key().as_ref()],
+        bump,
+    )]
+    pub counter: Account<'info, VoteCounter>,
+    #[account(init,payer=user,space=8+32+32+8+2+8,seeds=[b"withdraw_voting",withdraw.user.as_ref(),project.key().as_ref(),user.key().as_ref()],bump)]
+    pub voting: Account<'info, Voting>,
     pub system_program: Program<'info, System>,
 }

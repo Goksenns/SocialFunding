@@ -27,4 +27,6 @@ pub enum ErrorCode {
     InvalidChar,
 
     AlreadyExecuted,
+
+    InsufficiantError,
 }
