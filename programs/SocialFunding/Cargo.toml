@@ -7,6 +7,7 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "social_funding"
+path = "src/lib.rs"
 
 [features]
 no-entrypoint = []
@@ -14,9 +15,6 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
-
-[dev-dependencies]
-test ="0.11.0"
 
 [dependencies]
 anchor-lang = "0.26.0"
