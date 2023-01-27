@@ -30,6 +30,7 @@ pub mod social_funding {
 
         Ok(())
     }
+
     pub fn pause(ctx: Context<Pause>, pause: bool) -> Result<()> {
         let stage = &mut ctx.accounts.management;
         let admin = &mut ctx.accounts.admin;
@@ -95,6 +96,7 @@ pub mod social_funding {
 
         Ok(())
     }
+
     pub fn add_member_to_community(ctx: Context<AddMembertoCommunity>) -> Result<()> {
         let community = &mut ctx.accounts.community;
         let member_counter = &mut ctx.accounts.member_counter;
@@ -203,6 +205,7 @@ pub mod social_funding {
 
         Ok(())
     }
+    
     pub fn execute_project(ctx: Context<ExecuteProject>) -> Result<()> {
         let project = &mut ctx.accounts.project;
         let management = &mut ctx.accounts.management;

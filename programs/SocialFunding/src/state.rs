@@ -11,6 +11,7 @@ pub struct Management {
     pub donate_stage: i64,
     pub distribute_stage: i64,
 }
+
 #[derive(Accounts)]
 pub struct Stage<'info> {
     #[account(init,payer=admin,space=32+1+8+8+8)]
@@ -29,6 +30,7 @@ pub struct Pause<'info> {
     #[account(mut)]
     pub admin: Signer<'info>,
 }
+
 #[account]
 pub struct SolBank {
     pub amount: u64,
@@ -62,6 +64,7 @@ pub struct CreateCommunity<'info> {
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
+
 #[derive(Accounts)]
 pub struct JoinCommunity<'info> {
     #[account(mut)]
@@ -106,6 +109,7 @@ pub struct Project {
     pub description: String,
     pub executable: bool,
 }
+
 #[derive(Accounts)]
 pub struct CreateProject<'info> {
     #[account(init,payer=creator,space=8+32+32+8+4*50+4*200)]
@@ -166,11 +170,13 @@ impl VotingResult {
         }
     }
 }
+
 #[account]
 pub struct VoteCounter {
     pub yes_count: i64,
     pub no_count: i64,
 }
+
 #[derive(Accounts)]
 pub struct ExecuteProject<'info> {
     #[account(mut)]
