@@ -1,0 +1,664 @@
+{
+    "version": "0.1.0",
+    "name": "social_funding",
+    "instructions": [
+      {
+        "name": "stage",
+        "accounts": [
+          {
+            "name": "management",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "solBank",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "admin",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "solBankBump",
+            "type": "u8"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "pause",
+        "accounts": [
+          {
+            "name": "management",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "admin",
+            "isMut": true,
+            "isSigner": true
+          }
+        ],
+        "args": [
+          {
+            "name": "pause",
+            "type": "bool"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "createCommunity",
+        "accounts": [
+          {
+            "name": "community",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "members",
+            "type": {
+              "vec": "publicKey"
+            }
+          },
+          {
+            "name": "permission",
+            "type": "bool"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "joinCommunity",
+        "accounts": [
+          {
+            "name": "community",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "memberCounter",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [],
+        "returns": null
+      },
+      {
+        "name": "addMemberToCommunity",
+        "accounts": [
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "community",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "memberCounter",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [],
+        "returns": null
+      },
+      {
+        "name": "createProject",
+        "accounts": [
+          {
+            "name": "project",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "management",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "community",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "counter",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "subject",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "vote",
+        "accounts": [
+          {
+            "name": "voting",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "management",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "project",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "community",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "counter",
+            "isMut": true,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "vote",
+            "type": "string"
+          },
+          {
+            "name": "votingBump",
+            "type": "u8"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "executeProject",
+        "accounts": [
+          {
+            "name": "project",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "creator",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "management",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "community",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "counter",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "solBank",
+            "isMut": true,
+            "isSigner": false
+          }
+        ],
+        "args": [],
+        "returns": null
+      },
+      {
+        "name": "donateProject",
+        "accounts": [
+          {
+            "name": "donate",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "user",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "project",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "management",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "solBank",
+            "isMut": true,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "donate",
+            "type": "u64"
+          },
+          {
+            "name": "donateBump",
+            "type": "u8"
+          }
+        ],
+        "returns": null
+      },
+      {
+        "name": "distributeFunds",
+        "accounts": [
+          {
+            "name": "solBank",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "management",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "user",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "project",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "donate",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [],
+        "returns": null
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Management",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "admin",
+              "type": "publicKey"
+            },
+            {
+              "name": "pause",
+              "type": "bool"
+            },
+            {
+              "name": "executed",
+              "type": "bool"
+            },
+            {
+              "name": "projectStage",
+              "type": "i64"
+            },
+            {
+              "name": "votingStage",
+              "type": "i64"
+            },
+            {
+              "name": "executeStage",
+              "type": "i64"
+            },
+            {
+              "name": "donateStage",
+              "type": "i64"
+            },
+            {
+              "name": "distributeStage",
+              "type": "i64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "SolBank",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "amount",
+              "type": "u64"
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            },
+            {
+              "name": "projects",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "previousProject",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "solCounter",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Community",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "members",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "membersPool",
+              "type": {
+                "vec": "publicKey"
+              }
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "timestamp",
+              "type": "i64"
+            },
+            {
+              "name": "permission",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "MemberCounter",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "counter",
+              "type": "i64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Project",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "creator",
+              "type": "publicKey"
+            },
+            {
+              "name": "community",
+              "type": "publicKey"
+            },
+            {
+              "name": "subject",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "name": "executable",
+              "type": "bool"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Voting",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "user",
+              "type": "publicKey"
+            },
+            {
+              "name": "project",
+              "type": "publicKey"
+            },
+            {
+              "name": "timestamp",
+              "type": "i64"
+            },
+            {
+              "name": "result",
+              "type": {
+                "defined": "VotingResult"
+              }
+            },
+            {
+              "name": "bump",
+              "type": "u8"
+            }
+          ]
+        }
+      },
+      {
+        "name": "VoteCounter",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "yesCount",
+              "type": "i64"
+            },
+            {
+              "name": "noCount",
+              "type": "i64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Donate",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "amount",
+              "type": "u64"
+            },
+            {
+              "name": "donateCount",
+              "type": "u64"
+            },
+            {
+              "name": "timestamp",
+              "type": "i64"
+            },
+            {
+              "name": "donateBump",
+              "type": "u8"
+            }
+          ]
+        }
+      }
+    ],
+    "types": [
+      {
+        "name": "VotingResult",
+        "type": {
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Yes"
+            },
+            {
+              "name": "No"
+            },
+            {
+              "name": "Invalid"
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "InsufficientNumber",
+        "msg": "Your community does not have enough members."
+      },
+      {
+        "code": 6001,
+        "name": "NotMember",
+        "msg": "You are not in this community."
+      },
+      {
+        "code": 6002,
+        "name": "NotPublish",
+        "msg": "\n    Your project is not published because it did not receive enough votes. "
+      },
+      {
+        "code": 6003,
+        "name": "AuthenticationError"
+      },
+      {
+        "code": 6004,
+        "name": "ContractPause"
+      },
+      {
+        "code": 6005,
+        "name": "NotInProjectStage"
+      },
+      {
+        "code": 6006,
+        "name": "NotInVotingStage"
+      },
+      {
+        "code": 6007,
+        "name": "NotInExecuteStage"
+      },
+      {
+        "code": 6008,
+        "name": "NotInDonateStage"
+      },
+      {
+        "code": 6009,
+        "name": "NotInDistributeStage"
+      },
+      {
+        "code": 6010,
+        "name": "InvalidChar"
+      },
+      {
+        "code": 6011,
+        "name": "AlreadyExecuted"
+      }
+    ]
+  }
