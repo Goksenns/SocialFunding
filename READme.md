@@ -7,8 +7,8 @@
 
 - Kişilere ve kurumlara güvenmek zorunda bırakılmak yerine , merkeziyetsiz ve şeffaf bir sistem sağlıyoruz.
 - Uzun süredir devam eden zorlukları çözmeye katkıda bulunabilecek insanların dayanışmasını sağlıyoruz.
-- Sosyal fayda sağlayacak herhangi bir projenin fark edilmesi ve fon bulması için fırsat sağlıyoruz.
 - En çok oy alan projenin daha fazla fonlanmasını sağlayarak, herkesin hak ettiği kadar pay almasını sağlıyoruz.
+- Sosyal fayda sağlayacak herhangi bir projenin fark edilmesi ve fon bulması için fırsat sağlıyoruz.
 - Herhangi bir kuruluşun veya kişilerin aracı olmasının önüne geçiyoruz. Bağış yapmak isteyen insanları ve projeleri aracısız bir araya getiriyoruz.
 - İnsanlar, sadece istediği projeye bağış yapıyor ve blockchain tabanlı olan bu sistemde de bağışların takibini şeffaf bir şekilde yapabiliyor.
 
