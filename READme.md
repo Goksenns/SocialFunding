@@ -1,7 +1,7 @@
 ### <font color="F55050"><b>SORUNLAR:</b></font>
 
 - Bugün fon bulmak; sosyal örgütler, üniversite kulüpleri veya yaratıcı bir fikrini hayata geçirmek isteyen insanların sıklıkla karşılaştığı bir sorun . Özellikle sosyal fayda sağlayacak projelerin fonlanması, dikkate alınması, fark edilmesi daha da zor. 
-- Bunların yanında geleneksel kitlesel fonlamanın bir diğer sorunu , fonlamanın şeffaf olmaması. Toplanan bağışların takip edilemiyor olması da güvensiz bir sistemin sonucundan kaynaklı.
+- Bunların yanında geleneksel fonlamanın bir diğer sorunu , fonlamanın şeffaf olmaması. Toplanan bağışların takip edilemiyor olması da güvensiz bir sistemin sonucundan kaynaklıyor.
 
 ### <font color=AACB73><b>ÇÖZÜMLER:</b></font>
 
